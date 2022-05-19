@@ -1,0 +1,60 @@
+<html>
+<script src="https://www.gstatic.com/firebasejs/8.4.2/firebase-app.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/7.16.1/firebase-messaging.js"></script>
+<script>
+
+    // TODO: Replace firebaseConfig you get from Firebase Console
+    var firebaseConfig = {
+        apiKey: "",
+        authDomain: "",
+        databaseURL: "",
+        projectId: "",
+        storageBucket: "",
+        messagingSenderId: "",
+        appId: "",
+        measurementId: "",
+    };
+    firebase.initializeApp(firebaseConfig);
+
+    const messaging = firebase.messaging();
+    messaging
+        .requestPermission()
+        .then(function () {
+            console.log('Notification permission granted.');
+
+            // get the token in the form of promise
+            return messaging.getToken();
+        })
+        .then(function (token) {
+            //Make a call to our custom endpoint with the token in the body
+            axios({
+                method: 'post',
+                url: '/api/token',
+                data: {
+                    Token: token,
+                }
+            });
+            return token;
+        })
+        .catch(function (err) {
+            console.log('Unable to get permission to notify.', err);
+        });
+
+    let enableForegroundNotification = true;
+    messaging.onMessage(function (payload) {
+        console.log('Message received. ', payload);
+
+        if (enableForegroundNotification) {
+            let notification = payload.notification;
+            navigator.serviceWorker
+                .getRegistrations()
+                .then((registration) => {
+                    registration[0].showNotification(notification.title);
+                });
+        }
+    });
+</script>
+</body>
+</html>
