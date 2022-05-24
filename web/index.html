@@ -6,26 +6,35 @@
 <script>
 
     // TODO: Replace firebaseConfig you get from Firebase Console
-    var firebaseConfig = {
-        apiKey: "",
-        authDomain: "",
-        databaseURL: "",
-        projectId: "",
-        storageBucket: "",
-        messagingSenderId: "",
-        appId: "",
-        measurementId: "",
-    };
-    firebase.initializeApp(firebaseConfig);
+    // Import the functions you need from the SDKs you need
+    import { initializeApp } from "firebase/app";
+    import { getMessaging } from "firebase/messaging";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
 
-    const messaging = firebase.messaging();
+// Your web app's Firebase configuration
+  const firebaseConfig = {
+  apiKey: "AIzaSyA1AcX1b3BmlzaBXOrIHF5JwBYdshsTOw8",
+  authDomain: "push-notification-api-41fbd.firebaseapp.com",
+  projectId: "push-notification-api-41fbd",
+  storageBucket: "push-notification-api-41fbd.appspot.com",
+  messagingSenderId: "227374042037",
+  appId: "1:227374042037:web:8831a7be966f61902527fc"
+};
+
+// Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    firebase.initializeApp(firebaseConfig);
+    const messaging = getMessaging(app);
+
+    const firebase_messaging = firebase.messaging();
     messaging
         .requestPermission()
         .then(function () {
             console.log('Notification permission granted.');
 
             // get the token in the form of promise
-            return messaging.getToken();
+            return messaging.getToken({vapidkey : "BFbxLA1RqR0Jy7ckzO2eP_i7Q88oz-ArgiOeCn-MhmkOwWvZYOBAJlpzAXgIMrCJAma_cX-Wn-z2sJFJ0bSfs8M"});
         })
         .then(function (token) {
             //Make a call to our custom endpoint with the token in the body

@@ -13,6 +13,23 @@ type Token struct {
 }
 
 //TODO make another struct with token(string), username(string) and project(string).
+type Service struct {
+	container *restful.Container
+	Projects []int
+}
+
+func NewService() (*Service, error) {
+	r := &Service{
+		container: restful.NewContainer(),
+		Projects: make([]int, 0),
+	}
+
+type User struct {
+	Username string
+	Token    string
+	Project  []Projects
+}
+
 //TODO use it to save the user info and token in your in-memory database
 
 func main() {
