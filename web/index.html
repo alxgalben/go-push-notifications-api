@@ -6,43 +6,41 @@
 <script>
 
     // TODO: Replace firebaseConfig you get from Firebase Console
-    // Import the functions you need from the SDKs you need
-    import { initializeApp } from "firebase/app";
-    import { getMessaging } from "firebase/messaging";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
-  const firebaseConfig = {
-  apiKey: "AIzaSyA1AcX1b3BmlzaBXOrIHF5JwBYdshsTOw8",
-  authDomain: "push-notification-api-41fbd.firebaseapp.com",
-  projectId: "push-notification-api-41fbd",
-  storageBucket: "push-notification-api-41fbd.appspot.com",
-  messagingSenderId: "227374042037",
-  appId: "1:227374042037:web:8831a7be966f61902527fc"
-};
-
-// Initialize Firebase
-    const app = initializeApp(firebaseConfig);
+    var firebaseConfig = {
+        apiKey: "",
+        authDomain: "",
+        databaseURL: "",
+        projectId: "",
+        storageBucket: "",
+        messagingSenderId: "",
+        appId: "",
+        measurementId: ""
+    };
     firebase.initializeApp(firebaseConfig);
-    const messaging = getMessaging(app);
 
-    const firebase_messaging = firebase.messaging();
+    const queryString = window.location.href;
+    var url = new URL(queryString);
+    var username = url.searchParams.get("username");
+    var appname = url.searchParams.get("appname");
+
+    const messaging = firebase.messaging();
     messaging
         .requestPermission()
         .then(function () {
             console.log('Notification permission granted.');
 
             // get the token in the form of promise
-            return messaging.getToken({vapidkey : "BFbxLA1RqR0Jy7ckzO2eP_i7Q88oz-ArgiOeCn-MhmkOwWvZYOBAJlpzAXgIMrCJAma_cX-Wn-z2sJFJ0bSfs8M"});
+            return messaging.getToken();
         })
         .then(function (token) {
             //Make a call to our custom endpoint with the token in the body
             axios({
                 method: 'post',
-                url: '/api/token',
+                url: '/api/addSubscriber',
                 data: {
                     Token: token,
+                    Username: username,
+                    Appname: appname
                 }
             });
             return token;

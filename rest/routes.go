@@ -1,18 +1,19 @@
 package rest
 
 import (
+	"encoding/json"
+	"fmt"
+	"github.com/julienschmidt/httprouter"
+	"google.golang.org/genproto/googleapis/type/date"
 	"net/http"
-
-	"github.com/emicklei/go-restful/v3"
 )
 
-const (
-	token = "AAAA-fvtI1A:APA91bGQrxSmJA2YskZqQFkkG89UYUbUedAF9RaNaz2kYmZ1uAg-fQkyyQEFbxTbibDEcdCGM_1OE4NeNGY4l7aeShyJWxePGk8koo0rUfRbuVwMW_XBFaC083G0yHJ4FhX9PYyBhvvJ"
-)
-
-type Token struct {
-	Token string `json:"token"`
+type FirebaseInfo struct {
+	Token    string `json:"token"`
+	Username string `json:"username"`
+	AppName  string `json:"appname"`
 }
+
 type Subscriber struct {
 	Username     string
 	Token        string
@@ -24,69 +25,21 @@ type Application struct {
 	ExpirationDate date.Date
 }
 
-type Service struct {
-	container *restful.Container
-	tokens    []string
+func Register(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+	http.ServeFile(writer, request, "./web/index.html")
+	http.ServeFile(writer, request, "./static/firebase-messaging-sw.js")
 }
 
-func NewService() (*Service, error) {
-	r := &Service{
-		container: restful.NewContainer(),
-		tokens:    make([]string, 0),
+func AddSubscriber(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
+	var requestBody FirebaseInfo
+	err := json.NewDecoder(r.Body).Decode(&requestBody)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
 	}
+	fmt.Println(requestBody.Token)
+	fmt.Println(requestBody)
 
-	r.container.Add(r.buildRoutes())
+	//Here you need to create a subscriber and save it into the database
 
-	if err := bootstrapSwagger(r.container); err != nil {
-		return nil, err
-	}
-
-	return r, nil
-}
-
-func (r *Service) Container() *restful.Container {
-	return r.container
-}
-
-func (r *Service) buildRoutes() *restful.WebService {
-	ws := new(restful.WebService)
-
-	ws.Path("/internship-api").
-		Route(ws.GET("/health").
-			Operation("health check").
-			To(func(request *restful.Request, response *restful.Response) {
-				_ = response.WriteErrorString(http.StatusOK, "internship-api is up and running!")
-			}))
-
-	ws.Route(ws.GET("/vapid").
-		Returns(http.StatusOK, http.StatusText(http.StatusOK), token).
-		Returns(http.StatusBadRequest, http.StatusText(http.StatusBadRequest), EndpointErrorResponse{}).
-		Returns(http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError), EndpointErrorResponse{}).
-		To(r.GetToken).
-		Writes(map[string]string{}))
-
-	ws.Route(ws.PUT("/blackList/{"+BlackListParameter+"}").
-		Param(restful.QueryParameter("val", "numar").DataType("int").Required(true)).
-		Returns(http.StatusOK, http.StatusText(http.StatusOK), GetBlacklistResponse{}).
-		Returns(http.StatusBadRequest, http.StatusText(http.StatusBadRequest), EndpointErrorResponse{}).
-		Returns(http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError), EndpointErrorResponse{}).
-		To(r.AddBlacklistElement).
-		Writes(map[string]string{}))
-
-	ws.Route(ws.DELETE("/subscriber/{"+Subscriber+"}").
-		Param(restful.QueryParameter("subscriber").DataType("struct").Required(true)).
-		Returns(http.StatusOK, http.StatusText(http.StatusOK), token).
-		Returns(http.StatusBadRequest, http.StatusText(http.StatusBadRequest), token).
-		Returns(http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError), token).
-		To(r.DeleteNumberRequest).
-		Writes(map[string]string{}))
-
-	ws.Route(ws.GET("/blackList").
-		Returns(http.StatusOK, http.StatusText(http.StatusOK), GetFibonacciResponse{}).
-		Returns(http.StatusBadRequest, http.StatusText(http.StatusBadRequest), EndpointErrorResponse{}).
-		Returns(http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError), EndpointErrorResponse{}).
-		To(r.printBlacklist).
-		Writes(map[string]string{}))
-
-	return ws
 }

@@ -10,10 +10,10 @@ importScripts(
 // Initialize the Firebase app in the service worker by passing in the
 // messagingSenderId.
 firebase.initializeApp({
-    messagingSenderId: "227374042037",
-    apiKey: "AIzaSyA1AcX1b3BmlzaBXOrIHF5JwBYdshsTOw8",
-    projectId: "push-notification-api-41fbd",
-    appId: "1:227374042037:web:8831a7be966f61902527fc",
+    messagingSenderId: "",
+    apiKey: "",
+    projectId: "",
+    appId: "",
 });
 
 // Retrieve an instance of Firebase Messaging so that it can handle background
@@ -26,9 +26,9 @@ messaging.setBackgroundMessageHandler(function(payload) {
         payload,
     );
     // Customize notification here
-    const notificationTitle = "Ness Internship Notification Test";
+    const notificationTitle = "Background Message Title";
     const notificationOptions = {
-        body: "Aceasta notificare reprezinta un test.",
+        body: "Background Message body.",
         icon: "/itwonders-web-logo.png",
     };
 
