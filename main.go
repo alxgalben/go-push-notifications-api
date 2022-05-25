@@ -2,9 +2,10 @@ package main
 
 import (
 	"cloudstack_go/rest"
-	"github.com/julienschmidt/httprouter"
 	"log"
 	"net/http"
+
+	"github.com/julienschmidt/httprouter"
 )
 
 func main() {
